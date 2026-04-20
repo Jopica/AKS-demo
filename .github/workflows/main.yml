@@ -9,15 +9,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    env:
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4   # upgraded to latest
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
@@ -34,12 +28,9 @@ jobs:
       run: terraform apply -auto-approve tfplan
 
     - name: Azure Login
-      uses: azure/login@v1
+      uses: azure/login@v2   # upgraded to latest
       with:
-        client-id: ${{ secrets.ARM_CLIENT_ID }}
-        tenant-id: ${{ secrets.ARM_TENANT_ID }}
-        subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-        client-secret: ${{ secrets.ARM_CLIENT_SECRET }}
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Get AKS credentials
       run: az aks get-credentials --resource-group Terraform-demo-rg --name Terraform-aks-cluster --overwrite-existing
