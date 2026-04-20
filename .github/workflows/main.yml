@@ -3,15 +3,21 @@ name: Deploy AKS with Terraform
 on:
   push:
     branches:
-      - main   # adjust to your branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v4   # upgraded to latest
+      uses: actions/checkout@v4
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
@@ -27,8 +33,9 @@ jobs:
     - name: Terraform Apply
       run: terraform apply -auto-approve tfplan
 
+    # Azure CLI login for kubectl
     - name: Azure Login
-      uses: azure/login@v2   # upgraded to latest
+      uses: azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
